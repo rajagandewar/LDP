@@ -1,0 +1,101 @@
+🏗️ Mastra Workflow Implementation Plan: Recursive Parity Agent
+Phase 1: Intake & Parsing
+Step 1: Html-parser-tool
+
+Function: Ingests OSDimRAvsGCPTests12.html to extract failing columns and sample keys.
+
+Output: Identifies the GCP target (cl_unified_pms.WorkOrder) and the RA target (dbo.DimWorkOrder).
+
+Data Extraction: Captures the exact rows/keys and the specific issues (e.g., value mismatch in mractualworkminutes).
+
+Phase 2: Recursive Lineage Sourcing
+Step 2.1: GCP-Lineage
+
+Function: Recursively parses BigQuery stored procedures from the curated layer down to the LZ (Landing Zone).
+
+Scope: Fetches sp_WorkOrder_upsert and all referenced child procedures/UDFs.
+
+Step 2.2: RA-Lineage
+
+Function: Recursively parses SQL Server stored procedures using sp_helptext.…
+[5:31 pm, 9/3/2026] Anirudh Nathi: Step 1:
+1.1)Html-parser-tool: this tool takes the HTML file and then gives the columns with the issues, The rows with issues and the issue they are facing (For all the rows), The table from GCP where the columns are present, and the RA table where the columns are present. 
+
+Step 2:
+2.1)GCP-Lineage: Gives the lineage tree of the GCP table given from step 1 by parsing the store procedures. The parsing loop goes till we reach the LZ layer
+2.2) RA-Lineage: Gives the lineage tree of the RA table given from step 1 by parsing the store procedures. The parsing loop goes till we reach the LZ layer
+2.3) Store Parse: Stores the output of the Step1 to be used in the future.
+
+Step 3:
+3.1) GCP-Analyzer: Takes input from 2.1 and 2.3 to analyze the GCP lineage reffering the…
+[5:37 pm, 9/3/2026] Anirudh Nathi: RA-GCP Data Parity Mastra Workflow Plan
+Phase 1: Intake & Extraction
+Step 1.1: Html-parser-tool
+
+Action: Parses the provided HTML parity report (e.g., OSDimRAvsGCPTests12.html).
+
+Output: Extracts mismatched columns, specific failing rows, and the exact nature of each issue.
+
+Mapping: Identifies the corresponding GCP target table (e.g., cl_unified_pms.WorkOrder) and the RA source table (e.g., dbo.DimWorkOrder).
+
+Phase 2: Deep Lineage & Persistence
+Step 2.1: GCP-Lineage
+
+Action: Recursively parses BigQuery stored procedures starting from the curated table.
+
+Scope: Continues the parsing loop until the Landing Zone (LZ) layer is reached.
+
+Step 2.2: RA-Lineage
+
+Action: Recursively parses SQL Server stored procedures starting from the dimension table.
+
+Scope: Continues the parsing loop until the Landing Zone (LZ) layer is reached.
+
+Step 2.3: Store Parse
+
+Action: Persists the structured output from Step 1.1 into the workflow's memory/database for reference in all future steps.
+
+Phase 3: Platform-Specific Analysis
+Step 3.1: GCP-Analyzer
+
+Action: Analyzes the GCP lineage tree (from 2.1) against the mismatch manifest (from 2.3).
+
+Step 3.2: RA-Analyzer
+
+Action: Analyzes the RA lineage tree (from 2.2) against the mismatch manifest (from 2.3).
+
+Phase 4: Comparative Script Generation
+Step 4.1: Check-script-generator
+
+Action: Performs a side-by-side comparison of the GCP and RA lineage paths.
+
+Output: Generates diagnostic SQL scripts to verify if the spotted issues are correctly identified.
+
+Phase 5: Automated Validation Loop
+Step 5.1: GCP Checker
+
+Action: Executes the scripts generated in Step 4.1 against the GCP environment.
+
+Loopback: If the script is syntactically or logically incorrect, it triggers a loopback to Step 4.1 for re-generation.
+
+Result: Provides the "Before" (previously used) script and the "After" (modified) script based on the script in 4.1 step.
+
+Phase 6: Result Verification
+Step 6.1: GCP-Script-checker
+
+Action: Evaluates the changes made by the scripts in Step 5.1 against the expected parity output.
+
+Loopback: If the output does not meet the expected reconciliation criteria, it triggers a loopback to Step 4.1.
+
+Finalization: If successful, the evidence package is prepared for human review.
+
+Phase 7: Human-in-the-Loop & Deployment
+Step 7.1: HITL (Human-in-the-Loop)
+
+Action: Presents the validated diagnostic results and proposed fixes to the user.
+
+Decision:
+
+If Approved: The workflow proceeds to generate the Pull Request (PR) to update the stored procedures.
+
+If Rejected: The workflow loops back to Step 4.1 for a complete re-investigation.
