@@ -1,0 +1,191 @@
+Requirements Checklist for RA-GCP Parity Mastra Workflow
+
+Based on the AGENT_BUILD_SPEC and Mastra Framework documentation, the following technical and environmental requirements are listed for implementing the RA‑GCP parity Mastra workflow.
+
+1. Core Development Environment
+
+Node.js: v22.13.0+ — Mastra v1.x requires this specific version for stable operation.
+
+Package manager: pnpm — recommended for managing Mastra dependencies and monorepo structures.
+
+TypeScript: required for defining type-safe Workflow states and Tool schemas.
+
+Target: ES2022 — required TypeScript compilation target for the framework.
+
+2. Mastra Orchestration Components
+
+Workflow Engine: createWorkflow — manages the multi-step state machine (Intake → Sourcing → Analysis → Fix).
+
+Custom Tools: createTool — wrap BigQuery and SQL Server client logic into callable functions.
+
+Step Definitions: createStep — isolate specific tasks such as SQL Parsing or Report Generation.
+
+Persistence Layer: PostgreSQL or LibSQL to store investigation states and audit logs.
+
+Mastra Memory: @mastra/memory — persist nomenclature mappings and historical bug patterns across runs.
+
+3. API Keys and Authentication
+
+LLM API Key: for GPT‑4, Claude, or Gemini to perform root cause reasoning.
+
+Azure DevOps PAT: Personal Access Token with Read (code) and Write (PR/Branch) scopes.
+
+GCP Service Account: roles bigquery.dataViewer (Prod/QA) and bigquery.dataEditor (Scratch).
+
+SQL Server Credentials: service account with db_datareader and EXECUTE permissions for sp_helptext.
+
+Slack/Teams Webhook: for alerting humans at decision gates (e.g., Gate 2 Business Rule Decision).
+
+4. Networking and Connectivity
+
+VPN or Private Endpoint: secure access to the RA SQL Server (no public exposure).
+
+VPC Private Google Access: allow the agent to reach BigQuery without public internet egress.
+
+ODBC Driver: required for communication with the SQL Server backend.
+
+5. Logic and Metadata Assets
+
+SQL Dialect Translator/Parser: e.g., sqlglot to compare BigQuery and T‑SQL ASTs.
+
+Nomenclature Mapping: YAML/JSON file defining table and column aliases (example: Rs ↔ osl_).
+
+Pattern Library: structured list of recurring bug signatures (example: PAT-002: Cross-PMC contamination).
+
+Output Templates: Jinja2 or Liquid templates for generating final Markdown Defect Reports.
+
+Example Checklist (copy into your repository README as needed)
+
+Install Node.js v22.13.0+
+
+Install pnpm and bootstrap monorepo
+
+Configure TypeScript with target: "ES2022"
+
+Add Mastra packages and @mastra/memory
+
+Create workflow skeleton using createWorkflow, createTool, createStep
+
+Provision persistence (Postgres or LibSQL) and run migrations for investigation state and audit logs
+
+Store secrets: LLM API key, Azure DevOps PAT, GCP service account, SQL Server credentials, Slack/Teams webhook
+
+Network setup: VPN/private endpoint to RA SQL Server; VPC Private Google Access for BigQuery
+
+Install ODBC driver and verify connectivity to SQL Server
+
+Add SQL parser (sqlglot or equivalent) and test AST comparisons between BigQuery and T‑SQL
+
+Create nomenclature mapping file (YAML/JSON) and load into Mastra Memory
+
+Build pattern library of recurring bug signatures and wire into analysis steps
+
+Create output templates (Jinja2/Liquid) for Markdown Defect Reports
+
+Notes and Recommendations
+
+Environment parity: keep Prod/QA and Scratch credentials and roles separated to avoid accidental writes to production datasets.
+
+Auditability: ensure the persistence layer captures who/when/what for each investigation step.
+
+Secrets management: use a secure vault (e.g., Secret Manager) rather than plaintext in repo.
+
+Testing: include unit tests for createTool wrappers and integration tests for end‑to‑end workflow runs.
+
+Templates: keep Markdown templates modular so defect reports can be generated per-investigation or batched.
+
+Requirements Checklist for RA-GCP Parity Mastra Workflow
+
+Based on the AGENT_BUILD_SPEC and Mastra Framework documentation, the following technical and environmental requirements are listed for implementing the RA‑GCP parity Mastra workflow.
+
+1. Core Development Environment
+
+Node.js: v22.13.0+ — Mastra v1.x requires this specific version for stable operation.
+
+Package manager: pnpm — recommended for managing Mastra dependencies and monorepo structures.
+
+TypeScript: required for defining type-safe Workflow states and Tool schemas.
+
+Target: ES2022 — required TypeScript compilation target for the framework.
+
+2. Mastra Orchestration Components
+
+Workflow Engine: createWorkflow — manages the multi-step state machine (Intake → Sourcing → Analysis → Fix).
+
+Custom Tools: createTool — wrap BigQuery and SQL Server client logic into callable functions.
+
+Step Definitions: createStep — isolate specific tasks such as SQL Parsing or Report Generation.
+
+Persistence Layer: PostgreSQL or LibSQL to store investigation states and audit logs.
+
+Mastra Memory: @mastra/memory — persist nomenclature mappings and historical bug patterns across runs.
+
+3. API Keys and Authentication
+
+LLM API Key: for GPT‑4, Claude, or Gemini to perform root cause reasoning.
+
+Azure DevOps PAT: Personal Access Token with Read (code) and Write (PR/Branch) scopes.
+
+GCP Service Account: roles bigquery.dataViewer (Prod/QA) and bigquery.dataEditor (Scratch).
+
+SQL Server Credentials: service account with db_datareader and EXECUTE permissions for sp_helptext.
+
+Slack/Teams Webhook: for alerting humans at decision gates (e.g., Gate 2 Business Rule Decision).
+
+4. Networking and Connectivity
+
+VPN or Private Endpoint: secure access to the RA SQL Server (no public exposure).
+
+VPC Private Google Access: allow the agent to reach BigQuery without public internet egress.
+
+ODBC Driver: required for communication with the SQL Server backend.
+
+5. Logic and Metadata Assets
+
+SQL Dialect Translator/Parser: e.g., sqlglot to compare BigQuery and T‑SQL ASTs.
+
+Nomenclature Mapping: YAML/JSON file defining table and column aliases (example: Rs ↔ osl_).
+
+Pattern Library: structured list of recurring bug signatures (example: PAT-002: Cross-PMC contamination).
+
+Output Templates: Jinja2 or Liquid templates for generating final Markdown Defect Reports.
+
+Example Checklist (copy into your repository README as needed)
+
+Install Node.js v22.13.0+
+
+Install pnpm and bootstrap monorepo
+
+Configure TypeScript with target: "ES2022"
+
+Add Mastra packages and @mastra/memory
+
+Create workflow skeleton using createWorkflow, createTool, createStep
+
+Provision persistence (Postgres or LibSQL) and run migrations for investigation state and audit logs
+
+Store secrets: LLM API key, Azure DevOps PAT, GCP service account, SQL Server credentials, Slack/Teams webhook
+
+Network setup: VPN/private endpoint to RA SQL Server; VPC Private Google Access for BigQuery
+
+Install ODBC driver and verify connectivity to SQL Server
+
+Add SQL parser (sqlglot or equivalent) and test AST comparisons between BigQuery and T‑SQL
+
+Create nomenclature mapping file (YAML/JSON) and load into Mastra Memory
+
+Build pattern library of recurring bug signatures and wire into analysis steps
+
+Create output templates (Jinja2/Liquid) for Markdown Defect Reports
+
+Notes and Recommendations
+
+Environment parity: keep Prod/QA and Scratch credentials and roles separated to avoid accidental writes to production datasets.
+
+Auditability: ensure the persistence layer captures who/when/what for each investigation step.
+
+Secrets management: use a secure vault (e.g., Secret Manager) rather than plaintext in repo.
+
+Testing: include unit tests for createTool wrappers and integration tests for end‑to‑end workflow runs.
+
+Templates: keep Markdown templates modular so defect reports can be generated per-investigation or batched.
